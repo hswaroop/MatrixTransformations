@@ -1,0 +1,17 @@
+{
+  "name": "modular",
+  "version": "1.0.0",
+  "description": "To load javascript in modular way",
+  "main": "loading.ts",
+  "dependencies": {
+    "pixi.js": "^4.8.5",
+    "systemjs": "^0.19.47",
+    "typescript": "^3.2.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
