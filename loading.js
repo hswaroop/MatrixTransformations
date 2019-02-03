@@ -8,50 +8,51 @@ const app = new PIXI.Application({
 })
 document.body.appendChild(app.view)
 
-PIXI.loader.add('bunny', 'https://pbs.twimg.com/profile_images/965036344216039424/NQOVAYZ-_400x400.jpg').load((loader, resources)=>{
+PIXI.loader.add('bunny', 'https://pbs.twimg.com/profile_images/965036344216039424/NQOVAYZ-_400x400.jpg')
+           .add("bunnyStart", "./bunnyStart.jpg")
+           .add("lightningLine", "./lightning.png")
+           .load((loader, resources)=> {
 
-    const docParent = new PIXI.Container()
-    docParent.position.set(10,10)
-    docParent.scale.set(1)
-    app.stage.addChild(docParent);
-    const doc = new PIXI.Container()
-    doc.position.set(75,50)
-    doc.scale.set(0.5)
-    docParent.addChild(doc)
-    const sprite = new PIXI.Sprite(resources.bunny.texture)
+               const docParent = new PIXI.Container()
+               docParent.position.set(10, 10)
+               app.stage.addChild(docParent);
+               const bunnyStart = new PIXI.Sprite(resources.bunnyStart.texture);
+               bunnyStart.position.set(20, 20);
+               bunnyStart.anchor.set(0);
+               bunnyStart.scale.set(0.5);
+               docParent.addChild(bunnyStart);
+               const doc = new PIXI.Container();
+               doc.position.set(75, 50)
+               doc.scale.set(1)
+               docParent.addChild(doc)
 
-    sprite.anchor.set(0)
-    sprite.scale.set(1)
-    sprite.position.set(150,200)
-    //sprite.rotation = Math.PI/12
-    doc.addChild(sprite)
+               const sprite = new PIXI.Sprite(resources.bunny.texture)
 
-    const global = new PIXI.Graphics()
-    global.beginFill(0xff0000).drawCircle(0,0,5)
-    app.stage.addChild(global)
-
-    const local = new PIXI.Graphics()
-    local.beginFill(0x0000ff).drawCircle(0,0,20)
-    sprite.addChild(local)
-
-    sprite.interactive = true
-    sprite.on('pointerdown', function(e){
-
-        // the best way so far!
-        const p_local = new PIXI.Point(
-            this.texture.width * (1 - this.anchor.x), // right
-            this.texture.height * (1 - this.anchor.y)	// bottom
-        )
-        // from local to global
-
-        const stagePos0 = this.parent.parent.toGlobal(new PIXI.Point(0,0));
-        const stagePos = this.toLocal(stagePos0);
-
-        const globalCirclePos = this.toGlobal(p_local);
-        global.position.set(globalCirclePos.x, globalCirclePos.y);
-
-        // from global to local
-        const localCirclePos = this.toLocal(global.position);
-        local.position.set(localCirclePos.x, localCirclePos.y);
-    })
-})
+               sprite.anchor.set(0.5)
+               sprite.scale.set(0.5)
+               sprite.position.set(150, 200)
+               doc.addChild(sprite)
+               const lightningLine = new PIXI.Sprite(resources.lightningLine.texture);
+               sprite.addChild(lightningLine);
+               //reaching to baby bunny's top left corner
+               const bunnyLeftTop = bunnyStart.toGlobal(new PIXI.Point(0 - bunnyStart.texture.width * bunnyStart.anchor.x,
+                   0 - bunnyStart.texture.height * bunnyStart.anchor.y));
+               const localBunnyLeftTop = sprite.toLocal(bunnyLeftTop);
+               const spriteLeftTop = new PIXI.Point(0 - sprite.texture.width * sprite.anchor.x,
+                   0 - sprite.texture.height * sprite.anchor.y);
+               const line = new PIXI.Graphics();
+               const line2 = new PIXI.Graphics();
+               line.lineStyle(10, 0xD5402B, 1);
+               line2.lineStyle(10, 0xFFFFFF, 1);
+               sprite.addChild(line)
+               sprite.addChild(line2)
+               line.moveTo(spriteLeftTop.x, spriteLeftTop.y);
+               line.lineTo(localBunnyLeftTop.x, localBunnyLeftTop.y);
+               lightningLine.position.set(spriteLeftTop.x, spriteLeftTop.y);
+               const relativeY = spriteLeftTop.y - localBunnyLeftTop.y;
+               line2.moveTo(spriteLeftTop.x, spriteLeftTop.y);
+               line2.lineTo(spriteLeftTop.x, - (Math.abs(relativeY) + Math.abs(spriteLeftTop.y)));
+               lightningLine.height = relativeY;
+               lightningLine.width = relativeY;
+               lightningLine.rotation = Math.PI
+           })
